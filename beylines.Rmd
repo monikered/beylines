@@ -1,0 +1,76 @@
+---
+title: "beylines"
+author: "monikered"
+date: "5/10/2021"
+output: html_document
+---
+
+
+Draws from https://news.codecademy.com/taylor-swift-lyrics-machine-learning/amp/: an NLP analysis of Taylor Swift's lyrics done by ...
+
+I also referred to https://www.datacamp.com/community/tutorials/R-nlp-machine-learning this post on Data Camp on an NLP analysis of Prince's lyrics
+
+```{r}
+install.packages('dplyr')
+install.packages('magrittr')
+```
+
+First, read in the data.
+
+```{r}
+library(dplyr)
+a <- read.csv("https://gist.githubusercontent.com/sastoudt/cdc16a5a19cf9ae34db0231782231f27/raw/aa274f6c29273942dee5da34cb6c6a23ec67c8c8/beyLyricsNice.csv") %>% as_tibble()
+```
+This works! Turns out an update was all I needed to fix the ASCII problems. In order to tidy this, each column needs to represent a variable, and each row an observation.
+
+Let's look at column names!
+
+```{r}
+names(a)
+```
+
+Using select() to choose and rename the columns I need...   
+
+```{r}
+bey <- a %>%
+  select(line, song = song_name, line_num = song_line)
+dim(bey)
+```
+
+# todo: add album and song data, album yr, possible $$ or critical data
+Check a random line as a logic test...
+
+```{r}
+str(bey[139, ]$line)
+```
+
+...looks good! Next up, we've got to clean the data. Let's start with a de-contractor function.
+
+```{r}
+# make lowercase first
+bey$line <- sapply(bey$line, tolower)
+
+fix.contractions <- function(doc) {
+  doc <- gsub("won't", "will not", doc)
+  doc <- gsub("can't", "cannot", doc)
+  doc <- gsub("n't", " not", doc)
+  doc <- gsub("'ll", " will", doc)
+  doc <- gsub("'re", " are", doc)
+  doc <- gsub("'ve", " have", doc)
+  doc <- gsub("'m", " am", doc)
+  doc <- gsub("'d", " would", doc)
+  doc <- gsub("'cause", "because", doc)
+  # 's could be 'is' or could be possessive: it has no expansion
+  doc <- gsub("'s", "", doc)
+  return(doc)
+}
+
+# expand contractions
+bey$line <- sapply(bey$line, fix.contractions)
+```
+
+# to do: filter out any songs that have 'Spanish' or 'Live' in the $song string
+```{r}
+summary(bey)
+```
+
