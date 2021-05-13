@@ -1,7 +1,9 @@
-beylines
+bey\_lines
 ================
 monikered
 5/10/2021
+
+## Setting up the data
 
 I draw from <https://news.codecademy.com/taylor-swift-lyrics-machine-learning/amp/>: an NLP analysis of Taylor Swift's lyrics done by Ian Freed, as well as [this](https://www.datacamp.com/community/tutorials/R-nlp-machine-learning) NLP analysis of Prince's lyrics on Data Camp.
 
@@ -16,7 +18,7 @@ library(dplyr)
 a <- read.csv("https://gist.githubusercontent.com/sastoudt/cdc16a5a19cf9ae34db0231782231f27/raw/aa274f6c29273942dee5da34cb6c6a23ec67c8c8/beyLyricsNice.csv") %>% as_tibble()
 ```
 
-This works! Turns out an update was all I needed to fix the ASCII problems I was having earlier. In order to tidy this, each column needs to represent a variable, and each row an observation. Silge & Robinson define tidy text as a table with one token per row. It's going to take a minute for us to get there, so let's start by exploring what we do have.
+In order to tidy this, each column needs to represent a variable, and each row an observation. Silge & Robinson define tidy text as a table with one token per row. It's going to take a minute for us to get there, so let's start by exploring what we do have.
 
 Let's look at column names!
 
@@ -45,11 +47,18 @@ str(bey[139, ]$line)
 
     ##  chr "Smack it, smack it in the air, legs movin' side to side"
 
-...looks good! Next up, we've got to clean the data.
+...looks good! Our data set needs to be expanded, however, so I'm going to add album titles and years.
 
-## todo: filter out any songs that have 'Spanish' or 'Live' in the $song string
+``` r
+bey_albums <- data.frame(album = c("Dangerously in Love", "B'day", "I Am...Sasha Fierce", "4", "Beyoncé", "Lemonade"),
+                         year = c(2003, 2006, 2008, 2011, 2013, 2016))
+# todo: add song lists per album
+# then merge and filter the two dfs so that I have the complete lyrics of Beyoncé's studio albums
+```
 
-## todo: add album and song data, album yr, possible $$ or critical data
+Next up, we've got to clean the data. I'm going to try several approaches and see what yields the most useful results
+
+## Tidy Text Mining
 
 Trying some things from Tidy Text Mining! We can use tidytexts's unnest\_tokens() function to go word by word through all of Bey's songs.
 
@@ -121,3 +130,13 @@ bey$line <- sapply(bey$line, fix.contractions)
 ```
 
 This was cool to make and apply, but I'm not sure if I need it! Something to look into later.
+
+## Word Counts and Term Frequency
+
+An alternative to just counting the number of times a word appears in a song is more heavily weighting the more unusal words that appear. This is called the term frequency. (Term Frequency Inverse Document Frequency / TF-IDF)^
+
+See [this blog post](https://rstudio-pubs-static.s3.amazonaws.com/409864_408b4059a6a648128c17899d44b04a82.html) on using text mining on Ed Sheeran lyrics. The graphs term frequency over time tells us so much more about Sheeran as an artist than the word count graphs, which have significant overlap with most pop artists. The term frequency measure on song lyrics highlights what makes an artist distinct from the others.
+
+## Topic Modeling
+
+LDA?
