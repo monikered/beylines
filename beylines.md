@@ -47,7 +47,7 @@ str(bey[139, ]$line)
 
     ##  chr "Smack it, smack it in the air, legs movin' side to side"
 
-...looks good! Our data set needs to be expanded, however, so I'm going to add album titles and years.
+...looks good! Our data set needs to be expanded, however, so I'm going to add album titles, years, and track lists.
 
 ``` r
 bey_albums <- data.frame(album = c("Dangerously in Love", "B'day", "I Am...Sasha Fierce", "4", "Beyoncé", "Lemonade"),
@@ -56,7 +56,7 @@ bey_albums <- data.frame(album = c("Dangerously in Love", "B'day", "I Am...Sasha
 # then merge and filter the two dfs so that I have the complete lyrics of Beyoncé's studio albums
 ```
 
-Next up, we've got to clean the data. I'm going to try several approaches and see what yields the most useful results
+Next up, we've got to clean the data. I'm going to try several approaches and see what yields the most useful results.
 
 ## Tidy Text Mining
 
@@ -100,7 +100,28 @@ bey_long %>%
     ## 10 uh      408
     ## # … with 5,927 more rows
 
-A lot of things that show up in pop music. Next up, exploring other ways to remove stop words.
+Basically, a lot of things that show up in pop music. There are some pop vocalizations ("hey"", "uh") here in the top 10 that I'd want to add to my list of stop words.
+
+``` r
+print(stop_words)
+```
+
+    ## # A tibble: 1,149 x 2
+    ##    word        lexicon
+    ##    <chr>       <chr>  
+    ##  1 a           SMART  
+    ##  2 a's         SMART  
+    ##  3 able        SMART  
+    ##  4 about       SMART  
+    ##  5 above       SMART  
+    ##  6 according   SMART  
+    ##  7 accordingly SMART  
+    ##  8 across      SMART  
+    ##  9 actually    SMART  
+    ## 10 after       SMART  
+    ## # … with 1,139 more rows
+
+Next up, exploring other ways to reduce the dimensionality of the data.
 
 ## Manual Data Conditioning
 
@@ -131,9 +152,15 @@ bey$line <- sapply(bey$line, fix.contractions)
 
 This was cool to make and apply, but I'm not sure if I need it! Something to look into later.
 
+## Lemmatization
+
+A useful way to condense this text data is by looking at the root, or lemma, of each word in the corpus. This helps us group together all different forms of the same root word. For example, "wanna", "want", and "wants" are all lemmatized to "want."
+
 ## Word Counts and Term Frequency
 
-An alternative to just counting the number of times a word appears in a song is more heavily weighting the more unusal words that appear. This is called the term frequency. (Term Frequency Inverse Document Frequency / TF-IDF)^
+An alternative to just counting the number of times a word appears in a song is more heavily weighting the more unusal words that appear. This is called the inverse document frequency. (Term Frequency Inverse Document Frequency / TF-IDF)^
+
+Excellent blog post [here](https://towardsdatascience.com/introduction-to-nlp-part-3-tf-idf-explained-cedb1fc1f7dc) on TF-IDF. Helps provide the intuition behind various ways to measure term frequency.
 
 See [this blog post](https://rstudio-pubs-static.s3.amazonaws.com/409864_408b4059a6a648128c17899d44b04a82.html) on using text mining on Ed Sheeran lyrics. The graphs term frequency over time tells us so much more about Sheeran as an artist than the word count graphs, which have significant overlap with most pop artists. The term frequency measure on song lyrics highlights what makes an artist distinct from the others.
 
